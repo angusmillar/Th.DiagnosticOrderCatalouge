@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Th.Fhir.Terminology.Console/Th.Fhir.Terminology.Console.csproj" />
+  <Project Path="Th.Fhir.Terminology.Domain/Th.Fhir.Terminology.Domain.csproj" />
+</Solution>
