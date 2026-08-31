@@ -13,6 +13,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
     private const string ValueSetPathSegment = "/ValueSet/";
     private const string DesignationLanguage = "en-AU";
     private const char SynonymDelimiter = ',';
+    private DateTime Now;
     
     /// <summary>
     /// Declares that the ValueSet depends on a CodeSystem supplement and must not be used in its absence.
@@ -24,7 +25,8 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
         string? version = null)
     {
         businessCode = TrimAndValidateBusinessCode(businessCode);
-
+        Now = DateTime.Now;
+        
         if (terminologyRecordList.Count == 0)
         {
             throw new ApplicationException("The Catalogue must contain at least one terminology record.");
@@ -66,12 +68,18 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
         
         string localUrl = TrimUrl(localSystemUri);
 
-        CodeSystem localCodeSystem = BuildLocalCodeSystem(businessCode, localUrl, version, localRecordList);
+        CodeSystem localCodeSystem = BuildLocalCodeSystem(
+            businessCode, 
+            localUrl, 
+            version,
+            Now,
+            localRecordList);
 
         CodeSystem? supplementCodeSystem = BuildSupplementCodeSystem(
             businessCode,
             localUrl,
             version,
+            Now,
             internationalSystemUri,
             internationalRecordList);
 
@@ -79,6 +87,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
             businessCode,
             localUrl,
             version,
+            Now,
             localSystemUri,
             internationalSystemUri,
             internationalRecordList,
@@ -91,6 +100,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
         string businessName,
         string localUrl,
         string? version,
+        DateTime Date,
         List<TerminologyRecord> localRecordList)
     {
         
@@ -100,6 +110,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
             Url = localUrl,
             Name = $"{GetName(businessName)} Local Order Codes",
             Version = version,
+            DateElement = GetFhirDateTime(Date),
             Status = PublicationStatus.Active,
             Content = CodeSystemContentMode.Complete,
             CaseSensitive = true
@@ -122,6 +133,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
         string businessName,
         string localUrl,
         string? version,
+        DateTime Date,
         Uri? internationalSystemUri,
         List<TerminologyRecord> internationalRecordList)
     {
@@ -153,11 +165,18 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
             Url = localUrl + "-" + SupplementUrlSuffix,
             Name = $"{GetName(businessName)} Order Code " + GetName(SupplementUrlSuffix),
             Version = version,
+            DateElement = GetFhirDateTime(Date),
             Status = PublicationStatus.Active,
             Content = CodeSystemContentMode.Supplement,
             Supplements = TrimUrl(internationalSystemUri),
             Concept = conceptList
         };
+    }
+
+    private static FhirDateTime GetFhirDateTime(
+        DateTime date)
+    {
+        return new FhirDateTime(year: date.Year, month: date.Month, day: date.Day);
     }
 
     /// <summary>
@@ -168,6 +187,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
         string businessName,
         string localUrl,
         string? version,
+        DateTime Date,
         Uri localSystemUri,
         Uri? internationalSystemUri,
         List<TerminologyRecord> internationalRecordList,
@@ -179,6 +199,7 @@ public class FhirCatalogueFactory : IFhirCatalogueFactory
             Url = GetValueSetUrl(localUrl),
             Name = $"{GetName(businessName)} Order Catalogue",
             Version = version,
+            DateElement = GetFhirDateTime(Date),
             Status = PublicationStatus.Active,
             Compose = new ValueSet.ComposeComponent()
         };
