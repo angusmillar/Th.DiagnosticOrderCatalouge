@@ -4,6 +4,13 @@ A tool for converting a diagnostic order catalouge from CSV to the following FHI
 * CodeSystems (CodeSystem Supplementfor lab defined Synonyms over SNOMED or LOINC)
 * ValueSet (The Order Catalouge's ValueSet)
 
+To run the program see the `Th.Fhir.Terminology.Console` project.
+It takes an `OrderCatalogueCsvReaderInput` record with the follwoing parpameters:
+* **BusinessCode**: A codeifyed name of the provider (e.g. `acme-pathology`),
+* **InputCatalogueCsvFile**: The file path to ther input CSV order catalouge
+* **OutputDirectory**: The output directory the tool will write the generated FHIR resource to 
+* **CatalogueVersion**: The buiness version of the order catalogue in a Semantic Versioning (SemVer) format: (e.g. `1.0.0`)
+
 By deafult the tool expects a CSV file with the follwing coloum structure:
 
 | Code | DisplayName | SystemURI | Synonyms |
